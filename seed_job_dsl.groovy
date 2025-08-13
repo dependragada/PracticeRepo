@@ -1,12 +1,23 @@
-pipelineJob('auto-deploy') {
-    definition {
+pipelineJob('drims-dev-output-driver-api-ci-cd') {
+    description('Jenkins pipeline job for DRIMS output-driver API')
+      definition {
         cpsScm {
             scm {
                 git {
                     remote {
-                        url('https://github.com/rohitd260/DevOps.git')
+                        url('https://deepak_tewatia@bitbucket.org/drms-middleware/outputdriver.git')
+                        credentials('abb6aa0c-c6c5-42a7-a154-1e78fdec9a58')
                     }
-                    branches('*/master')
+                    branches('**')
+                    browser {
+                        bitbucketWeb {
+                            repoUrl('https://deepak_tewatia@bitbucket.org/drms-middleware/outputdriver.git')
+                        }
+                    }
+                     extensions {
+                         //Add the Clean before checkout extension
+                        cleanBeforeCheckout()
+                    }
                 }
             }
             scriptPath('Jenkinsfile')
