@@ -11,7 +11,7 @@ pipelineJob('drims-dev-output-driver-api-ci-cd') {
                     branches('**')
                     browser {
                         bitbucketWeb {
-                            repoUrl('https://deepak_tewatia@bitbucket.org/drms-middleware/outputdriver.git')
+                            repoUrl('https://manav@bitbucket.org/drms-middleware/outputdriver.git')
                         }
                     }
                      extensions {
