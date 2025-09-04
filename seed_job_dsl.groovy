@@ -1,26 +1,68 @@
-pipelineJob('drims-dev-output-driver-api-ci-cd') {
-    description('Jenkins pipeline job for DRIMS output-driver API')
-      definition {
-        cpsScm {
-            scm {
-                git {
-                    remote {
-                        url('https://manav@bitbucket.org/drms-middleware/outputdriver.git')
-                        credentials('35345436')
-                    }
-                    branches('**')
-                    browser {
-                        bitbucketWeb {
-                            repoUrl('https://manav@bitbucket.org/drms-middleware/outputdriver.git')
-                        }
-                    }
-                     extensions {
-                         //Add the Clean before checkout extension
-                        cleanBeforeCheckout()
-                    }
+def services = [
+    [ 
+        name: 'service-A', 
+        repo: 'https://bitbucket.org/your-org/service-a.git', 
+        branch: 'main',
+        buildScript: '''
+            echo "Building Service A..."
+            mvn clean install
+            touch fileA
+        '''
+    ],
+    [ 
+        name: 'service-B', 
+        repo: 'https://bitbucket.org/your-org/service-b.git', 
+        branch: 'develop',
+        buildScript: '''
+            echo "Deploying Service B..."
+            npm install
+            npm run build
+            touch fileB
+        '''
+    ],
+    [ 
+        name: 'service-C', 
+        repo: 'https://bitbucket.org/your-org/service-c.git', 
+        branch: 'release',
+        buildScript: '''
+            echo "Testing Service C..."
+            pytest tests/
+            touch fileC
+        '''
+    ]
+]
+
+services.each { svc ->
+    job("deploy-${svc.name}") {
+        description("This Job is used to deploy ${svc.name}")
+
+        // Restrict where this project can be run
+        label('aws-cloud')
+
+        // Source Code Management
+        scm {
+            git {
+                remote {
+                    url(svc.repo)
+                    credentials('bitbucket-credentials-id') // Jenkins credentials ID
                 }
+                branch(svc.branch)
             }
-            scriptPath('Jenkinsfile')
+        }
+
+        // Build Triggers
+        triggers {
+            scm('H/15 * * * *') // poll SCM every 15 minutes
+        }
+
+        // Build Environment
+        wrappers {
+            preBuildCleanup()
+        }
+
+        // Build Steps
+        steps {
+            shell(svc.buildScript)
         }
     }
 }
