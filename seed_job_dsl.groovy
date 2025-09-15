@@ -51,9 +51,9 @@ services.each { svc ->
         }
 
         // Build Triggers
-        triggers {
-            scm('H/15 * * * *') // poll SCM every 15 minutes
-        }
+        //triggers {
+         //   scm('H/15 * * * *') // poll SCM every 15 minutes
+       // }
 
         // Build Environment
         wrappers {
